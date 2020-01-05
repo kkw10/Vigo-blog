@@ -1,25 +1,33 @@
-import React from "react"
+import React, {useEffect} from "react"
 import { Link, graphql } from "gatsby"
-
+import styled from 'styled-components';
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
+import Tags from '../components/tags';
 
-class BlogIndex extends React.Component {
+const Article = styled.article`
+  border-bottom: 1px solid #ddd;
+  &:last-child { border-bottom: none };
+`;
+
+class BlogIndex extends React.Component {  
   render() {
     const { data } = this.props
     const siteTitle = data.site.siteMetadata.title
+    const tagArr = data.allMarkdownRemark.edges
     const posts = data.allMarkdownRemark.edges
 
     return (
       <Layout location={this.props.location} title={siteTitle}>
+        <>{console.log(tagArr)}</>
         <SEO title="All posts" />
         <Bio />
-        {posts.map(({ node }) => {
+        {posts.map(({ node }, i) => {
           const title = node.frontmatter.title || node.fields.slug
           return (
-            <article key={node.fields.slug}>
+            <Article key={node.fields.slug}>
               <header>
                 <h3
                   style={{
@@ -38,10 +46,11 @@ class BlogIndex extends React.Component {
                     __html: node.frontmatter.description || node.excerpt,
                   }}
                 />
+                <Tags tagArr={tagArr[i].node.frontmatter.tags} />
               </section>
-            </article>
+            </Article>
           )
-        })}
+        })}      
       </Layout>
     )
   }
@@ -67,6 +76,7 @@ export const pageQuery = graphql`
             date(formatString: "MMMM DD, YYYY")
             title
             description
+            tags
           }
         }
       }

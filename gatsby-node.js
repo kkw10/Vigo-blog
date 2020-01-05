@@ -1,10 +1,11 @@
-const path = require(`path`)
+const path = require(`path`);
+const _ = require("lodash");
 const { createFilePath } = require(`gatsby-source-filesystem`)
 
-exports.createPages = async ({ graphql, actions }) => {
+exports.createPages = async ({ graphql, actions, reporter }) => {
   const { createPage } = actions
-
-  const blogPost = path.resolve(`./src/templates/blog-post.js`)
+  const blogPost = path.resolve(`./src/templates/blog-post.js`);
+  const blogTagPost = path.resolve(`./src/templates/tags.js`);
   const result = await graphql(
     `
       {
@@ -19,6 +20,7 @@ exports.createPages = async ({ graphql, actions }) => {
               }
               frontmatter {
                 title
+                tags
               }
             }
           }
@@ -28,6 +30,7 @@ exports.createPages = async ({ graphql, actions }) => {
   )
 
   if (result.errors) {
+    reporter.panicOnBuild(`Error while running GraphQL query.`)
     throw result.errors
   }
 
